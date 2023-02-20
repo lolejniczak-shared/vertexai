@@ -1,0 +1,661 @@
+# PIPELINE DEFINITION
+# Name: wf-ccc-ex2-automl-dataset
+# Inputs:
+#    in_bigquery_dataset: str [Default: 'crm_cookie_match']
+#    in_bigquery_projectid: str [Default: 'projektccc']
+#    in_bigquery_table: str [Default: 'crm_cookie_match']
+#    in_prefix: str [Default: 'demo']
+#    in_vertexai_projectid: str [Default: 'defaultprojectid']
+#    in_vertexai_region: str [Default: 'us-central1']
+components:
+  comp-automl-tabular-training-job:
+    executorLabel: exec-automl-tabular-training-job
+    inputDefinitions:
+      artifacts:
+        dataset:
+          artifactType:
+            schemaTitle: google.VertexDataset
+            schemaVersion: 0.0.1
+      parameters:
+        budget_milli_node_hours:
+          isOptional: true
+          parameterType: NUMBER_INTEGER
+        column_specs:
+          isOptional: true
+          parameterType: STRUCT
+        column_transformations:
+          isOptional: true
+          parameterType: LIST
+        disable_early_stopping:
+          defaultValue: false
+          isOptional: true
+          parameterType: BOOLEAN
+        display_name:
+          parameterType: STRING
+        export_evaluated_data_items:
+          defaultValue: false
+          isOptional: true
+          parameterType: BOOLEAN
+        export_evaluated_data_items_bigquery_destination_uri:
+          isOptional: true
+          parameterType: STRING
+        export_evaluated_data_items_override_destination:
+          isOptional: true
+          parameterType: BOOLEAN
+        is_default_version:
+          isOptional: true
+          parameterType: BOOLEAN
+        labels:
+          defaultValue: {}
+          isOptional: true
+          parameterType: STRUCT
+        location:
+          defaultValue: us-central1
+          isOptional: true
+          parameterType: STRING
+        model_display_name:
+          isOptional: true
+          parameterType: STRING
+        model_encryption_spec_key_name:
+          isOptional: true
+          parameterType: STRING
+        model_id:
+          isOptional: true
+          parameterType: STRING
+        model_labels:
+          isOptional: true
+          parameterType: STRUCT
+        model_version_aliases:
+          isOptional: true
+          parameterType: LIST
+        model_version_description:
+          isOptional: true
+          parameterType: STRING
+        optimization_objective:
+          isOptional: true
+          parameterType: STRING
+        optimization_objective_precision_value:
+          isOptional: true
+          parameterType: NUMBER_DOUBLE
+        optimization_objective_recall_value:
+          isOptional: true
+          parameterType: NUMBER_DOUBLE
+        optimization_prediction_type:
+          parameterType: STRING
+        parent_model:
+          isOptional: true
+          parameterType: STRING
+        predefined_split_column_name:
+          isOptional: true
+          parameterType: STRING
+        project:
+          parameterType: STRING
+        target_column:
+          parameterType: STRING
+        test_fraction_split:
+          isOptional: true
+          parameterType: NUMBER_DOUBLE
+        timestamp_split_column_name:
+          isOptional: true
+          parameterType: STRING
+        training_encryption_spec_key_name:
+          isOptional: true
+          parameterType: STRING
+        training_fraction_split:
+          isOptional: true
+          parameterType: NUMBER_DOUBLE
+        validation_fraction_split:
+          isOptional: true
+          parameterType: NUMBER_DOUBLE
+        weight_column:
+          isOptional: true
+          parameterType: STRING
+    outputDefinitions:
+      artifacts:
+        model:
+          artifactType:
+            schemaTitle: google.VertexModel
+            schemaVersion: 0.0.1
+  comp-endpoint-create:
+    executorLabel: exec-endpoint-create
+    inputDefinitions:
+      parameters:
+        description:
+          defaultValue: ''
+          isOptional: true
+          parameterType: STRING
+        display_name:
+          parameterType: STRING
+        encryption_spec_key_name:
+          defaultValue: ''
+          isOptional: true
+          parameterType: STRING
+        labels:
+          defaultValue: {}
+          isOptional: true
+          parameterType: STRUCT
+        location:
+          defaultValue: us-central1
+          isOptional: true
+          parameterType: STRING
+        network:
+          defaultValue: ''
+          isOptional: true
+          parameterType: STRING
+        project:
+          parameterType: STRING
+    outputDefinitions:
+      artifacts:
+        endpoint:
+          artifactType:
+            schemaTitle: google.VertexEndpoint
+            schemaVersion: 0.0.1
+      parameters:
+        gcp_resources:
+          parameterType: STRING
+  comp-model-deploy:
+    executorLabel: exec-model-deploy
+    inputDefinitions:
+      artifacts:
+        endpoint:
+          artifactType:
+            schemaTitle: google.VertexEndpoint
+            schemaVersion: 0.0.1
+          isOptional: true
+        model:
+          artifactType:
+            schemaTitle: google.VertexModel
+            schemaVersion: 0.0.1
+      parameters:
+        automatic_resources_max_replica_count:
+          defaultValue: 0.0
+          isOptional: true
+          parameterType: NUMBER_INTEGER
+        automatic_resources_min_replica_count:
+          defaultValue: 0.0
+          isOptional: true
+          parameterType: NUMBER_INTEGER
+        dedicated_resources_accelerator_count:
+          defaultValue: 0.0
+          isOptional: true
+          parameterType: NUMBER_INTEGER
+        dedicated_resources_accelerator_type:
+          defaultValue: ''
+          isOptional: true
+          parameterType: STRING
+        dedicated_resources_machine_type:
+          defaultValue: ''
+          isOptional: true
+          parameterType: STRING
+        dedicated_resources_max_replica_count:
+          defaultValue: 0.0
+          isOptional: true
+          parameterType: NUMBER_INTEGER
+        dedicated_resources_min_replica_count:
+          defaultValue: 0.0
+          isOptional: true
+          parameterType: NUMBER_INTEGER
+        deployed_model_display_name:
+          defaultValue: ''
+          isOptional: true
+          parameterType: STRING
+        disable_container_logging:
+          defaultValue: false
+          isOptional: true
+          parameterType: BOOLEAN
+        enable_access_logging:
+          defaultValue: false
+          isOptional: true
+          parameterType: BOOLEAN
+        explanation_metadata:
+          defaultValue: {}
+          isOptional: true
+          parameterType: STRUCT
+        explanation_parameters:
+          defaultValue: {}
+          isOptional: true
+          parameterType: STRUCT
+        service_account:
+          defaultValue: ''
+          isOptional: true
+          parameterType: STRING
+        traffic_split:
+          defaultValue: {}
+          isOptional: true
+          parameterType: STRUCT
+    outputDefinitions:
+      parameters:
+        gcp_resources:
+          parameterType: STRING
+  comp-tabular-dataset-create:
+    executorLabel: exec-tabular-dataset-create
+    inputDefinitions:
+      parameters:
+        bq_source:
+          isOptional: true
+          parameterType: STRING
+        display_name:
+          parameterType: STRING
+        encryption_spec_key_name:
+          isOptional: true
+          parameterType: STRING
+        gcs_source:
+          isOptional: true
+          parameterType: STRING
+        labels:
+          defaultValue: {}
+          isOptional: true
+          parameterType: STRUCT
+        location:
+          defaultValue: us-central1
+          isOptional: true
+          parameterType: STRING
+        project:
+          parameterType: STRING
+    outputDefinitions:
+      artifacts:
+        dataset:
+          artifactType:
+            schemaTitle: google.VertexDataset
+            schemaVersion: 0.0.1
+deploymentSpec:
+  executors:
+    exec-automl-tabular-training-job:
+      container:
+        args:
+        - --init.project
+        - '{{$.inputs.parameters[''project'']}}'
+        - --init.location
+        - '{{$.inputs.parameters[''location'']}}'
+        - --init.display_name
+        - '{{$.inputs.parameters[''display_name'']}}'
+        - --init.optimization_prediction_type
+        - '{{$.inputs.parameters[''optimization_prediction_type'']}}'
+        - --method.dataset
+        - '{{$.inputs.artifacts[''dataset''].metadata[''resourceName'']}}'
+        - --method.target_column
+        - '{{$.inputs.parameters[''target_column'']}}'
+        - '{"IfPresent": {"InputName": "optimization_objective", "Then": ["--init.optimization_objective",
+          "{{$.inputs.parameters[''optimization_objective'']}}"]}}'
+        - '{"IfPresent": {"InputName": "column_specs", "Then": ["--init.column_specs",
+          "{{$.inputs.parameters[''column_specs'']}}"]}}'
+        - '{"IfPresent": {"InputName": "column_transformations", "Then": ["--init.column_transformations",
+          "{{$.inputs.parameters[''column_transformations'']}}"]}}'
+        - '{"IfPresent": {"InputName": "optimization_objective_recall_value", "Then":
+          ["--init.optimization_objective_recall_value", "{{$.inputs.parameters[''optimization_objective_recall_value'']}}"]}}'
+        - '{"IfPresent": {"InputName": "optimization_objective_precision_value", "Then":
+          ["--init.optimization_objective_precision_value", "{{$.inputs.parameters[''optimization_objective_precision_value'']}}"]}}'
+        - --init.labels
+        - '{{$.inputs.parameters[''labels'']}}'
+        - '{"IfPresent": {"InputName": "training_encryption_spec_key_name", "Then":
+          ["--init.training_encryption_spec_key_name", "{{$.inputs.parameters[''training_encryption_spec_key_name'']}}"]}}'
+        - '{"IfPresent": {"InputName": "model_encryption_spec_key_name", "Then": ["--init.model_encryption_spec_key_name",
+          "{{$.inputs.parameters[''model_encryption_spec_key_name'']}}"]}}'
+        - '{"IfPresent": {"InputName": "training_fraction_split", "Then": ["--method.training_fraction_split",
+          "{{$.inputs.parameters[''training_fraction_split'']}}"]}}'
+        - '{"IfPresent": {"InputName": "validation_fraction_split", "Then": ["--method.validation_fraction_split",
+          "{{$.inputs.parameters[''validation_fraction_split'']}}"]}}'
+        - '{"IfPresent": {"InputName": "test_fraction_split", "Then": ["--method.test_fraction_split",
+          "{{$.inputs.parameters[''test_fraction_split'']}}"]}}'
+        - '{"IfPresent": {"InputName": "predefined_split_column_name", "Then": ["--method.predefined_split_column_name",
+          "{{$.inputs.parameters[''predefined_split_column_name'']}}"]}}'
+        - '{"IfPresent": {"InputName": "timestamp_split_column_name", "Then": ["--method.timestamp_split_column_name",
+          "{{$.inputs.parameters[''timestamp_split_column_name'']}}"]}}'
+        - '{"IfPresent": {"InputName": "weight_column", "Then": ["--method.weight_column",
+          "{{$.inputs.parameters[''weight_column'']}}"]}}'
+        - '{"IfPresent": {"InputName": "budget_milli_node_hours", "Then": ["--method.budget_milli_node_hours",
+          "{{$.inputs.parameters[''budget_milli_node_hours'']}}"]}}'
+        - '{"IfPresent": {"InputName": "model_display_name", "Then": ["--method.model_display_name",
+          "{{$.inputs.parameters[''model_display_name'']}}"]}}'
+        - '{"IfPresent": {"InputName": "model_labels", "Then": ["--method.model_labels",
+          "{{$.inputs.parameters[''model_labels'']}}"]}}'
+        - '{"IfPresent": {"InputName": "model_id", "Then": ["--method.model_id", "{{$.inputs.parameters[''model_id'']}}"]}}'
+        - '{"IfPresent": {"InputName": "parent_model", "Then": ["--method.parent_model",
+          "{{$.inputs.parameters[''parent_model'']}}"]}}'
+        - '{"IfPresent": {"InputName": "is_default_version", "Then": ["--method.is_default_version",
+          "{{$.inputs.parameters[''is_default_version'']}}"]}}'
+        - '{"IfPresent": {"InputName": "model_version_aliases", "Then": ["--method.model_version_aliases",
+          "{{$.inputs.parameters[''model_version_aliases'']}}"]}}'
+        - '{"IfPresent": {"InputName": "model_version_description", "Then": ["--method.model_version_description",
+          "{{$.inputs.parameters[''model_version_description'']}}"]}}'
+        - --method.disable_early_stopping
+        - '{{$.inputs.parameters[''disable_early_stopping'']}}'
+        - --method.export_evaluated_data_items
+        - '{{$.inputs.parameters[''export_evaluated_data_items'']}}'
+        - '{"IfPresent": {"InputName": "export_evaluated_data_items_bigquery_destination_uri",
+          "Then": ["--method.export_evaluated_data_items_bigquery_destination_uri",
+          "{{$.inputs.parameters[''export_evaluated_data_items_bigquery_destination_uri'']}}"]}}'
+        - '{"IfPresent": {"InputName": "export_evaluated_data_items_override_destination",
+          "Then": ["--method.export_evaluated_data_items_override_destination", "{{$.inputs.parameters[''export_evaluated_data_items_override_destination'']}}"]}}'
+        - --executor_input
+        - '{{$}}'
+        - --resource_name_output_artifact_uri
+        - '{{$.outputs.artifacts[''model''].uri}}'
+        command:
+        - python3
+        - -m
+        - google_cloud_pipeline_components.container.aiplatform.remote_runner
+        - --cls_name
+        - AutoMLTabularTrainingJob
+        - --method_name
+        - run
+        image: gcr.io/ml-pipeline/google-cloud-pipeline-components:1.0.33
+    exec-endpoint-create:
+      container:
+        args:
+        - --type
+        - CreateEndpoint
+        - --payload
+        - '{"Concat": ["{", "\"display_name\": \"", "{{$.inputs.parameters[''display_name'']}}",
+          "\"", ", \"description\": \"", "{{$.inputs.parameters[''description'']}}",
+          "\"", ", \"labels\": ", "{{$.inputs.parameters[''labels'']}}", ", \"encryption_spec\":
+          {\"kms_key_name\":\"", "{{$.inputs.parameters[''encryption_spec_key_name'']}}",
+          "\"}", ", \"network\": \"", "{{$.inputs.parameters[''network'']}}", "\"",
+          "}"]}'
+        - --project
+        - '{{$.inputs.parameters[''project'']}}'
+        - --location
+        - '{{$.inputs.parameters[''location'']}}'
+        - --gcp_resources
+        - '{{$.outputs.parameters[''gcp_resources''].output_file}}'
+        - --executor_input
+        - '{{$}}'
+        command:
+        - python3
+        - -u
+        - -m
+        - google_cloud_pipeline_components.container.v1.endpoint.create_endpoint.launcher
+        image: gcr.io/ml-pipeline/google-cloud-pipeline-components:1.0.33
+    exec-model-deploy:
+      container:
+        args:
+        - --type
+        - DeployModel
+        - --payload
+        - '{"Concat": ["{", "\"endpoint\": \"", "{{$.inputs.artifacts[''endpoint''].metadata[''resourceName'']}}",
+          "\"", ", \"traffic_split\": ", "{{$.inputs.parameters[''traffic_split'']}}",
+          ", \"deployed_model\": {", "\"model\": \"", "{{$.inputs.artifacts[''model''].metadata[''resourceName'']}}",
+          "\"", ", \"dedicated_resources\": {", "\"machine_spec\": {", "\"machine_type\":
+          \"", "{{$.inputs.parameters[''dedicated_resources_machine_type'']}}", "\"",
+          ", \"accelerator_type\": \"", "{{$.inputs.parameters[''dedicated_resources_accelerator_type'']}}",
+          "\"", ", \"accelerator_count\": ", "{{$.inputs.parameters[''dedicated_resources_accelerator_count'']}}",
+          "}", ", \"min_replica_count\": ", "{{$.inputs.parameters[''dedicated_resources_min_replica_count'']}}",
+          ", \"max_replica_count\": ", "{{$.inputs.parameters[''dedicated_resources_max_replica_count'']}}",
+          "}", ", \"automatic_resources\": {", "\"min_replica_count\": ", "{{$.inputs.parameters[''automatic_resources_min_replica_count'']}}",
+          ", \"max_replica_count\": ", "{{$.inputs.parameters[''automatic_resources_max_replica_count'']}}",
+          "}", ", \"service_account\": \"", "{{$.inputs.parameters[''service_account'']}}",
+          "\"", ", \"disable_container_logging\": ", "{{$.inputs.parameters[''disable_container_logging'']}}",
+          ", \"enable_access_logging\": ", "{{$.inputs.parameters[''enable_access_logging'']}}",
+          ", \"explanation_spec\": {", "\"parameters\": ", "{{$.inputs.parameters[''explanation_parameters'']}}",
+          ", \"metadata\": ", "{{$.inputs.parameters[''explanation_metadata'']}}",
+          "}", "}", "}"]}'
+        - --project
+        - ''
+        - --location
+        - ''
+        - --gcp_resources
+        - '{{$.outputs.parameters[''gcp_resources''].output_file}}'
+        command:
+        - python3
+        - -u
+        - -m
+        - google_cloud_pipeline_components.container.v1.endpoint.deploy_model.launcher
+        image: gcr.io/ml-pipeline/google-cloud-pipeline-components:1.0.33
+    exec-tabular-dataset-create:
+      container:
+        args:
+        - --method.project
+        - '{{$.inputs.parameters[''project'']}}'
+        - --method.location
+        - '{{$.inputs.parameters[''location'']}}'
+        - --method.display_name
+        - '{{$.inputs.parameters[''display_name'']}}'
+        - '{"IfPresent": {"InputName": "gcs_source", "Then": ["--method.gcs_source",
+          "{{$.inputs.parameters[''gcs_source'']}}"]}}'
+        - '{"IfPresent": {"InputName": "bq_source", "Then": ["--method.bq_source",
+          "{{$.inputs.parameters[''bq_source'']}}"]}}'
+        - --method.labels
+        - '{{$.inputs.parameters[''labels'']}}'
+        - '{"IfPresent": {"InputName": "encryption_spec_key_name", "Then": ["--method.encryption_spec_key_name",
+          "{{$.inputs.parameters[''encryption_spec_key_name'']}}"]}}'
+        - --executor_input
+        - '{{$}}'
+        - --resource_name_output_artifact_uri
+        - '{{$.outputs.artifacts[''dataset''].uri}}'
+        command:
+        - python3
+        - -m
+        - google_cloud_pipeline_components.container.aiplatform.remote_runner
+        - --cls_name
+        - TabularDataset
+        - --method_name
+        - create
+        image: gcr.io/ml-pipeline/google-cloud-pipeline-components:1.0.33
+pipelineInfo:
+  name: wf-ccc-ex2-automl-dataset
+root:
+  dag:
+    tasks:
+      automl-tabular-training-job:
+        cachingOptions:
+          enableCache: true
+        componentRef:
+          name: comp-automl-tabular-training-job
+        dependentTasks:
+        - tabular-dataset-create
+        inputs:
+          artifacts:
+            dataset:
+              taskOutputArtifact:
+                outputArtifactKey: dataset
+                producerTask: tabular-dataset-create
+          parameters:
+            budget_milli_node_hours:
+              runtimeValue:
+                constant: 2000.0
+            column_specs:
+              runtimeValue:
+                constant:
+                  app_add_to_wishlist_month_freq_1: numeric
+                  app_add_to_wishlist_month_freq_2: numeric
+                  app_add_to_wishlist_month_freq_3: numeric
+                  app_search_freq_month_freq_1: numeric
+                  app_search_freq_month_freq_2: numeric
+                  app_search_freq_month_freq_3: numeric
+                  app_select_promotion_month_freq_1: numeric
+                  app_select_promotion_month_freq_2: numeric
+                  app_select_promotion_month_freq_3: numeric
+                  app_sessions_freq_month_freq_1: numeric
+                  app_sessions_freq_month_freq_2: numeric
+                  app_sessions_freq_month_freq_3: numeric
+                  app_view_item_month_freq_1: numeric
+                  app_view_item_month_freq_2: numeric
+                  app_view_item_month_freq_3: numeric
+                  crm_club_level_id: numeric
+                  crm_store_purchase_month_freq_1: numeric
+                  crm_store_purchase_month_freq_2: numeric
+                  crm_store_purchase_month_freq_3: numeric
+                  weight: numeric
+                  www_basket_freq_sku: numeric
+                  www_basket_value_monthly_1: numeric
+                  www_basket_value_monthly_2: numeric
+                  www_basket_value_monthly_3: numeric
+                  www_channel_freq__afiliacja: numeric
+                  www_channel_freq__direct_organic: numeric
+                  www_channel_freq__facebook: numeric
+                  www_channel_freq__klub: numeric
+                  www_channel_freq__porownywarki: numeric
+                  www_channel_freq__portale: numeric
+                  www_channel_freq__retargeting: numeric
+                  www_channel_freq__sem: numeric
+                  www_channel_freq__traffic: numeric
+                  www_coupon_add_month_1: numeric
+                  www_coupon_add_month_2: numeric
+                  www_coupon_add_month_3: numeric
+                  www_device_freq_desktop: numeric
+                  www_device_freq_mobile: numeric
+                  www_esizeme_freq_esizeme_filtr: numeric
+                  www_esizeme_freq_esizme_applied: numeric
+                  www_gallery_click_month_1: numeric
+                  www_gallery_click_month_2: numeric
+                  www_gallery_click_month_3: numeric
+                  www_pages_visited_month_1: numeric
+                  www_pages_visited_month_2: numeric
+                  www_pages_visited_month_3: numeric
+                  www_product_trans_freq_damskie_buty: numeric
+                  www_product_trans_freq_dzieciece: numeric
+                  www_product_trans_freq_meskie_buty: numeric
+                  www_product_trans_freq_torby: numeric
+                  www_promo_click_month_1: numeric
+                  www_promo_click_month_2: numeric
+                  www_promo_click_month_3: numeric
+                  www_time_onsite_avg_month_1: numeric
+                  www_time_onsite_avg_month_2: numeric
+                  www_time_onsite_avg_month_3: numeric
+                  www_trans_month_freq_1: numeric
+                  www_trans_month_freq_2: numeric
+                  www_trans_month_freq_3: numeric
+                  www_umbrella_click_month_1: numeric
+                  www_umbrella_click_month_2: numeric
+                  www_umbrella_click_month_3: numeric
+                  www_visits_add_fav_1: numeric
+                  www_visits_add_fav_2: numeric
+                  www_visits_add_fav_3: numeric
+                  www_visits_month_freq_1: numeric
+                  www_visits_month_freq_2: numeric
+                  www_visits_month_freq_3: numeric
+                  y_if_trans: numeric
+            display_name:
+              runtimeValue:
+                constant: train-automl-{{$.inputs.parameters['pipelinechannel--in_prefix']}}
+            model_display_name:
+              runtimeValue:
+                constant: promo-classification-automl-{{$.inputs.parameters['pipelinechannel--in_prefix']}}
+            optimization_objective:
+              runtimeValue:
+                constant: maximize-au-roc
+            optimization_prediction_type:
+              runtimeValue:
+                constant: classification
+            pipelinechannel--in_prefix:
+              componentInputParameter: in_prefix
+            project:
+              componentInputParameter: in_vertexai_projectid
+            target_column:
+              runtimeValue:
+                constant: y_if_trans
+            test_fraction_split:
+              runtimeValue:
+                constant: 0.2
+            training_fraction_split:
+              runtimeValue:
+                constant: 0.6
+            validation_fraction_split:
+              runtimeValue:
+                constant: 0.2
+            weight_column:
+              runtimeValue:
+                constant: weight
+        taskInfo:
+          name: automl-tabular-training-job
+      endpoint-create:
+        cachingOptions:
+          enableCache: true
+        componentRef:
+          name: comp-endpoint-create
+        inputs:
+          parameters:
+            display_name:
+              runtimeValue:
+                constant: promo-classification-{{$.inputs.parameters['pipelinechannel--in_prefix']}}-endpoint
+            pipelinechannel--in_prefix:
+              componentInputParameter: in_prefix
+            project:
+              componentInputParameter: in_vertexai_projectid
+        taskInfo:
+          name: endpoint-create
+      model-deploy:
+        cachingOptions:
+          enableCache: true
+        componentRef:
+          name: comp-model-deploy
+        dependentTasks:
+        - automl-tabular-training-job
+        - endpoint-create
+        inputs:
+          artifacts:
+            endpoint:
+              taskOutputArtifact:
+                outputArtifactKey: endpoint
+                producerTask: endpoint-create
+            model:
+              taskOutputArtifact:
+                outputArtifactKey: model
+                producerTask: automl-tabular-training-job
+          parameters:
+            dedicated_resources_machine_type:
+              runtimeValue:
+                constant: n1-standard-4
+            dedicated_resources_max_replica_count:
+              runtimeValue:
+                constant: 2.0
+            dedicated_resources_min_replica_count:
+              runtimeValue:
+                constant: 1.0
+            traffic_split:
+              runtimeValue:
+                constant:
+                  '0': '100'
+        taskInfo:
+          name: model-deploy
+      tabular-dataset-create:
+        cachingOptions:
+          enableCache: true
+        componentRef:
+          name: comp-tabular-dataset-create
+        inputs:
+          parameters:
+            bq_source:
+              runtimeValue:
+                constant: bq://{{$.inputs.parameters['pipelinechannel--in_bigquery_projectid']}}.{{$.inputs.parameters['pipelinechannel--in_bigquery_dataset']}}.{{$.inputs.parameters['pipelinechannel--in_bigquery_table']}}
+            display_name:
+              runtimeValue:
+                constant: ccc-dataset
+            pipelinechannel--in_bigquery_dataset:
+              componentInputParameter: in_bigquery_dataset
+            pipelinechannel--in_bigquery_projectid:
+              componentInputParameter: in_bigquery_projectid
+            pipelinechannel--in_bigquery_table:
+              componentInputParameter: in_bigquery_table
+            project:
+              componentInputParameter: in_vertexai_projectid
+        taskInfo:
+          name: tabular-dataset-create
+  inputDefinitions:
+    parameters:
+      in_bigquery_dataset:
+        defaultValue: crm_cookie_match
+        isOptional: true
+        parameterType: STRING
+      in_bigquery_projectid:
+        defaultValue: projektccc
+        isOptional: true
+        parameterType: STRING
+      in_bigquery_table:
+        defaultValue: crm_cookie_match
+        isOptional: true
+        parameterType: STRING
+      in_prefix:
+        defaultValue: demo
+        isOptional: true
+        parameterType: STRING
+      in_vertexai_projectid:
+        defaultValue: defaultprojectid
+        isOptional: true
+        parameterType: STRING
+      in_vertexai_region:
+        defaultValue: us-central1
+        isOptional: true
+        parameterType: STRING
+schemaVersion: 2.1.0
+sdkVersion: kfp-2.0.0-beta.10

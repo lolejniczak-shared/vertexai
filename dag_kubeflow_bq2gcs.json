@@ -1,0 +1,117 @@
+{
+  "pipelineSpec": {
+    "components": {
+      "comp-preprocess": {
+        "executorLabel": "exec-preprocess",
+        "inputDefinitions": {
+          "parameters": {
+            "bq_dataset": {
+              "type": "STRING"
+            },
+            "bq_projectid": {
+              "type": "STRING"
+            },
+            "bq_table": {
+              "type": "STRING"
+            }
+          }
+        },
+        "outputDefinitions": {
+          "artifacts": {
+            "output_dataset": {
+              "artifactType": {
+                "schemaTitle": "system.Dataset",
+                "schemaVersion": "0.0.1"
+              }
+            }
+          }
+        }
+      }
+    },
+    "deploymentSpec": {
+      "executors": {
+        "exec-preprocess": {
+          "container": {
+            "args": [
+              "--executor_input",
+              "{{$}}",
+              "--function_to_execute",
+              "preprocess"
+            ],
+            "command": [
+              "sh",
+              "-c",
+              "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip || python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet     --no-warn-script-location 'pandas' 'db-dtypes' 'google-cloud-bigquery' 'pyarrow' 'kfp==1.8.14' && \"$0\" \"$@\"\n",
+              "sh",
+              "-ec",
+              "program_path=$(mktemp -d)\nprintf \"%s\" \"$0\" > \"$program_path/ephemeral_component.py\"\npython3 -m kfp.v2.components.executor_main                         --component_module_path                         \"$program_path/ephemeral_component.py\"                         \"$@\"\n",
+              "\nimport kfp\nfrom kfp.v2 import dsl\nfrom kfp.v2.dsl import *\nfrom typing import *\n\ndef preprocess(bq_projectid: str, bq_dataset: str, bq_table: str, output_dataset: Output[Dataset]):\n    from google.cloud import bigquery\n    import google.auth\n\n    ##authenticate \n    auth_credentials, auth_project = google.auth.default()\n    print(\"Project: \"+auth_project)\n    client = bigquery.Client(project=bq_projectid, credentials = auth_credentials)\n\n\n    query = f\"SELECT * FROM {bq_projectid}.{bq_dataset}.{bq_table}\"\n    print(query)\n\n    ## fetch query results as dataframe\n    dataframe = client.query(query).to_dataframe()\n    print(dataframe.head()) \n\n    ## export resultset into csv file om GCS\n    dataframe.to_csv(output_dataset.path)\n\n"
+            ],
+            "image": "python:3.7"
+          }
+        }
+      }
+    },
+    "pipelineInfo": {
+      "name": "wf-kubeflow-bq2gcs"
+    },
+    "root": {
+      "dag": {
+        "tasks": {
+          "preprocess": {
+            "cachingOptions": {
+              "enableCache": true
+            },
+            "componentRef": {
+              "name": "comp-preprocess"
+            },
+            "inputs": {
+              "parameters": {
+                "bq_dataset": {
+                  "componentInputParameter": "in_bq_dataset"
+                },
+                "bq_projectid": {
+                  "componentInputParameter": "in_bq_projectid"
+                },
+                "bq_table": {
+                  "componentInputParameter": "in_bq_table"
+                }
+              }
+            },
+            "taskInfo": {
+              "name": "preprocess"
+            }
+          }
+        }
+      },
+      "inputDefinitions": {
+        "parameters": {
+          "in_bq_dataset": {
+            "type": "STRING"
+          },
+          "in_bq_projectid": {
+            "type": "STRING"
+          },
+          "in_bq_table": {
+            "type": "STRING"
+          }
+        }
+      }
+    },
+    "schemaVersion": "2.0.0",
+    "sdkVersion": "kfp-1.8.14"
+  },
+  "runtimeConfig": {
+    "parameters": {
+      "in_bq_dataset": {
+        "stringValue": "xxxx"
+      },
+      "in_bq_projectid": {
+        "stringValue": "defaultprojectid"
+      },
+      "in_bq_table": {
+        "stringValue": "yyyy"
+      }
+    }
+  }
+}

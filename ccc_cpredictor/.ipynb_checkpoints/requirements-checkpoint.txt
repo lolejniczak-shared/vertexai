@@ -5,4 +5,3 @@ joblib~=1.0
 tensorflow
 google-cloud-storage>=1.26.0,<2.0.0dev
 google-cloud-aiplatform[prediction]>=1.16.0
-pandas

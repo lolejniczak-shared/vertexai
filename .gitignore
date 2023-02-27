@@ -2,4 +2,6 @@ ccc_predictor
 *.yaml
 *.txt
 *.json
+.env
+.ipynb_checkpoints
 

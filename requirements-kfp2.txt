@@ -1,0 +1,13 @@
+kfp==2.0.0b12
+google-cloud-pipeline-components==1.0.33
+google-cloud-storage>=2.2.1
+google-cloud-aiplatform>=1.21.0
+google-cloud-aiplatform[prediction]>=1.16.0
+fastapi
+protobuf>=3.9.2
+tensorflow==2.4
+keras-tuner
+uvicorn==0.17.6
+joblib~=1.0
+numpy~=1.19.2
+scikit-learn~=0.24
